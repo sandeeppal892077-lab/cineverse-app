@@ -18,7 +18,7 @@ export default function VideoPlayer({ tmdbId, type, title, poster, season, episo
   const [showPlayer, setShowPlayer] = useState(false);
 
   const source = STREAMING_SOURCES.find(s => s.id === sourceId);
-  const embedUrl = source?.embedUrl(tmdbId, type, season, episode);
+  const embedUrl = source?.embedUrl(tmdbId, type, title, season, episode);
   const episodeLabel = type === 'tv' ? ` S${season || 1}:E${episode || 1}` : '';
 
   if (!showPlayer) {

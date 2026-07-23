@@ -1,15 +1,24 @@
 export interface StreamingSource {
   id: string;
   label: string;
-  embedUrl: (tmdbId: number, type: 'movie' | 'tv', season?: number, episode?: number) => string;
+  embedUrl: (tmdbId: number, type: 'movie' | 'tv', title?: string, season?: number, episode?: number) => string;
   enabled: boolean;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 export const STREAMING_SOURCES: StreamingSource[] = [
   {
     id: 'vidking',
     label: 'VidKing',
-    embedUrl: (tmdbId, type, season, episode) => {
+    embedUrl: (tmdbId, type, _title, season, episode) => {
       if (type === 'tv') {
         const s = season || 1;
         const e = episode || 1;
@@ -22,24 +31,21 @@ export const STREAMING_SOURCES: StreamingSource[] = [
   {
     id: 'peestream',
     label: 'PeeStream',
-    embedUrl: (tmdbId, type, season, episode) => {
+    embedUrl: (tmdbId, type, title, season, episode) => {
+      const slug = slugify(title || 'movie');
       if (type === 'tv') {
-        const s = season || 1;
-        const e = episode || 1;
-        return `https://peestream.in/embed/${tmdbId}?s=${s}&e=${e}`;
+        return `https://peestream.in/media/tmdb-tv-${tmdbId}-${slug}`;
       }
-      return `https://peestream.in/embed/${tmdbId}`;
+      return `https://peestream.in/media/tmdb-movie-${tmdbId}-${slug}`;
     },
     enabled: true,
   },
   {
     id: 'vidsrc',
     label: 'VidSrc',
-    embedUrl: (tmdbId, type, season, episode) => {
+    embedUrl: (tmdbId, type, _title, season, episode) => {
       const base = 'https://vidsrc-embed.ru/embed';
       if (type === 'tv') {
-        const s = season || 1;
-        const e = episode || 1;
         return `${base}/tv?tmdb=${tmdbId}&ds_lang=en`;
       }
       return `${base}/movie?tmdb=${tmdbId}`;
